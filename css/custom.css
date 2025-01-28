@@ -1,0 +1,7 @@
+/* 文章封面图
+  article-cover-image */
+.post-bg#post-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
