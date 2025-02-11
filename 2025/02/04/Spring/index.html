@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/imgs/logo.png">
+  <link rel="icon" href="/imgs/logo.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="MoSheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Spring依赖注入方式（5种） 构造器注入：通过构造函数传递依赖项。Spring 推荐使用这种方式，因为它确保了对象在创建时就已经完全初始化。 12345678910@Componentpublic class MyService &#123;    private final MyDependency myDependency;        @Autowired    public Myse">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring">
+<meta property="og:url" content="http://qingzhenglu.github.io/2025/02/04/Spring/index.html">
+<meta property="og:site_name" content="个人随笔">
+<meta property="og:description" content="Spring依赖注入方式（5种） 构造器注入：通过构造函数传递依赖项。Spring 推荐使用这种方式，因为它确保了对象在创建时就已经完全初始化。 12345678910@Componentpublic class MyService &#123;    private final MyDependency myDependency;        @Autowired    public Myse">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-02-04T04:35:36.000Z">
+<meta property="article:modified_time" content="2025-02-06T09:00:39.988Z">
+<meta property="article:author" content="MoSheng">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Spring - 个人随笔</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"qingzhenglu.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>不默生&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/imgs/background.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spring"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-04 12:35" pubdate>
+          2025年2月4日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spring</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="Spring依赖注入方式（5种）"><a href="#Spring依赖注入方式（5种）" class="headerlink" title="Spring依赖注入方式（5种）"></a>Spring依赖注入方式（5种）</h3><ul>
+<li><p><strong>构造器注入</strong>：通过构造函数传递依赖项。Spring 推荐使用这种方式，因为它确保了对象在创建时就已经完全初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyService</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> MyDependency myDependency;<br>    <br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Myservice</span><span class="hljs-params">(MyDependency myDependency)</span> &#123;<br>        <span class="hljs-built_in">this</span>.myDependency = myDependency;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Setter 注入</strong>：通过 setter 方法设置依赖项。这种方式的好处是在有变更的情况下，可以重新注入。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyService</span> &#123;<br>    <span class="hljs-keyword">private</span> MyDependency myDependency;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setMyDependency</span><span class="hljs-params">(MyDependency myDependency)</span> &#123;<br>        <span class="hljs-built_in">this</span>.myDependency = myDependency;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>字段注入</strong>：直接在字段上使用 <code>@Autowired</code> 注解。这种方式虽然常见，但官方不推荐，因为它隐藏了类的依赖关系，且无法注入静态字段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyService</span> &#123;<br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> MyDependency myDependency;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+</li>
+<li><p><strong>方法注入</strong>：通过方法参数注入依赖项，通常用于特定方法的依赖。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyService</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">performAction</span><span class="hljs-params">(<span class="hljs-meta">@Autowired</span> MyDependency myDependency)</span> &#123;<br>        myDependency.doSomething();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+</li>
+<li><p><strong>接口回调注入</strong>：通过实现 Spring 定义的一些内建接口，例如 <code>BeanFactoryAware</code>，会进行 <code>BeanFactory</code> 的注入。这种方式不常用。</p>
+</li>
+</ul>
+<hr>
+<h3 id="Spring-Bean作用域"><a href="#Spring-Bean作用域" class="headerlink" title="Spring Bean作用域"></a>Spring Bean作用域</h3><ul>
+<li><p><strong>singleton</strong>：默认作用域，整个 Spring 容器中只有一个实例。</p>
+</li>
+<li><p><strong>prototype</strong>：每次获取 Bean 时都会创建一个新的实例。</p>
+</li>
+<li><p><strong>request</strong>：每个 HTTP 请求都会创建一个新的 Bean 实例，仅在 Spring Web 应用中有效。</p>
+</li>
+<li><p><strong>session</strong>：每个 HTTP 会话中会创建一个 Bean 实例，仅在 Spring Web 应用中有效。</p>
+</li>
+<li><p><strong>application</strong>：整个 <code>ServletContext</code> 生命周期中只有一个 Bean 实例，仅在 Spring Web 应用中有效。</p>
+</li>
+<li><p><strong>websocket</strong>：每个 <code>WebSocket</code>会话中会创建一个 Bean 实例，仅在 Spring Web 应用中有效。</p>
+</li>
+</ul>
+<hr>
+<h3 id="Bean-和-Component-的区别"><a href="#Bean-和-Component-的区别" class="headerlink" title="@Bean 和 @Component 的区别"></a>@Bean 和 @Component 的区别</h3><p>@Bean 和 @Component 都是用于定义 Spring 容器中的 Bean 的注解，但它们的使用场景和方式有所不同：</p>
+<h4 id="Bean："><a href="#Bean：" class="headerlink" title="@Bean："></a><strong>@Bean</strong>：</h4><ul>
+<li><p><strong>使用位置</strong>：通常用于 Java 配置类的方法上。</p>
+</li>
+<li><p><strong>用途</strong>：用于显式声明一个 Bean 并将其添加到 Spring 容器中，适用于配置第三方库或复杂对象。</p>
+</li>
+<li><p><strong>扫描机制</strong>：不支持自动扫描，需要手动注册。</p>
+</li>
+<li><p><strong>示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AppConfig</span> &#123;<br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> DataSource <span class="hljs-title function_">dataSource</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-type">DriverManagerDataSource</span> <span class="hljs-variable">dataSource</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DriverManagerDataSource</span>();<br>        dataSource.setDriverClassName(<span class="hljs-string">&quot;com.mysql.jdbc.Driver&quot;</span>);<br>        dataSource.setUrl(<span class="hljs-string">&quot;jdbc:mysql://localhost:3306/mydb&quot;</span>);<br>        dataSource.setUsername(<span class="hljs-string">&quot;user&quot;</span>);<br>        dataSource.setPassword(<span class="hljs-string">&quot;password&quot;</span>);<br>        <span class="hljs-keyword">return</span> dataSource;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="Component："><a href="#Component：" class="headerlink" title="@Component："></a><strong>@Component</strong>：</h4><ul>
+<li><p><strong>使用位置</strong>：用于类级别，将该类标记为 Spring 容器中的一个组件。</p>
+</li>
+<li><p><strong>用途</strong>：用于自动扫描和注入，适用于自定义服务、DAO 层、控制器等类的自动注册。</p>
+</li>
+<li><p><strong>扫描机制</strong>：支持自动扫描，通过 <code>@ComponentScan</code> 自动发现。</p>
+</li>
+<li><p><strong>衍生注解</strong>：</p>
+<ul>
+<li><strong>@Service</strong>：用于标识服务层的类</li>
+<li><strong>@Repository</strong>：用于标识数据访问层的类（DAO层）</li>
+<li><strong>@Controller</strong>：用于标识控制器类，通常用于Spring MVC中处理HTTP请求</li>
+</ul>
+</li>
+<li><p><strong>示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserService</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createUser</span><span class="hljs-params">(String name)</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Creating user: &quot;</span> + name);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>总结来说，@Bean 更灵活，适合复杂初始化和手动配置，而 @Component 自动化更强，适合类的简单注册和自动发现。</p>
+<hr>
+<h3 id="Qualifier-注解的作用"><a href="#Qualifier-注解的作用" class="headerlink" title="@Qualifier 注解的作用"></a>@Qualifier 注解的作用</h3><p>@Qualifier 注解在 Spring 中的主要作用是用于在依赖注入时消除歧义。当一个类型有多个实现时，@Qualifier 注解可以指定需要注入哪一个具体的 Bean。</p>
+<p>例如，假设有多个 Service 实现类，可以通过 @Qualifier 指定名称选择对应的实现 Bean：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Client</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Service service;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Client</span><span class="hljs-params">(<span class="hljs-meta">@Qualifier(&quot;serviceImpl1&quot;)</span> Service service)</span> &#123;<br>        <span class="hljs-built_in">this</span>.service = service;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doSomething</span><span class="hljs-params">()</span> &#123;<br>        service.serve();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>在这个例子中，@Qualifier(“serviceImpl1”) 指定了要注入的具体实现类 <code>serviceImpl1</code>。</p>
+<p>此外，@Qualifier 可以与 @Primary 一起使用，覆盖 @Primary 的默认行为。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@Primary</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DefaultService</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Service</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serve</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Default Service&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@Qualifier(&quot;specificService&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SpecificService</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Service</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">serve</span><span class="hljs-params">()</span> &#123;<br>        System.out.println(<span class="hljs-string">&quot;Specific Service&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Client</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Service service;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Client</span><span class="hljs-params">(<span class="hljs-meta">@Qualifier(&quot;specificService&quot;)</span> Service service)</span> &#123;<br>        <span class="hljs-built_in">this</span>.service = service;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doSomething</span><span class="hljs-params">()</span> &#123;<br>        service.serve();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>即使 <code>DefaultService</code> 被标记为 @Primary，但由于 <code>@Qualifier(&quot;specificService&quot;)</code>，所以最终注入的仍然是 <code>SpecificService</code>。</p>
+<hr>
+<h3 id="Value-的作用"><a href="#Value-的作用" class="headerlink" title="@Value 的作用"></a>@Value 的作用</h3><p>在 Spring 框架中，<code>@Value</code> 注解用于将外部化的配置值注入到 Spring 管理的 Bean 中。通过 <code>@Value</code> 注解，可以将属性文件、环境变量、系统属性等外部资源中的值注入到 Spring Bean 的字段、方法参数或构造函数参数中。</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><ol>
+<li><strong>配置文件注入</strong>：将属性文件中的值注入到 Bean 中。</li>
+<li><strong>系统属性和环境变量</strong>：将系统属性或环境变量的值注入到 Bean 中。</li>
+<li><strong>默认值设置</strong>：在属性不可用时，提供默认值。</li>
+</ol>
+<h4 id="举例说明"><a href="#举例说明" class="headerlink" title="举例说明"></a>举例说明</h4><p>Properties文件</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-attr">app.name</span>=<span class="hljs-string">MyApp</span><br><span class="hljs-attr">app.version</span>=<span class="hljs-string">1.0.0</span><br><br></code></pre></td></tr></table></figure>
+
+<p>@Value注解注入属性</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Value;<br><span class="hljs-keyword">import</span> org.springframework.stereotype.Component;<br><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AppConfig</span> &#123;<br><br>    <span class="hljs-meta">@Value(&quot;$&#123;app.name&#125;&quot;)</span><br>    <span class="hljs-keyword">private</span> String appName;<br><br>    <span class="hljs-meta">@Value(&quot;$&#123;app.version&#125;&quot;)</span><br>    <span class="hljs-keyword">private</span> String appVersion;<br><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getAppName</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> appName;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getAppVersion</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> appVersion;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Spring-中的-ModelAttribute注解的作用"><a href="#Spring-中的-ModelAttribute注解的作用" class="headerlink" title="Spring 中的 @ModelAttribute注解的作用"></a>Spring 中的 @ModelAttribute注解的作用</h3><p>在 Spring 框架中，<code>@ModelAttribute</code> 注解有两个主要作用：</p>
+<ol>
+<li><p><strong>在控制器方法参数中使用</strong>：将请求参数绑定到方法参数上，并将其添加到模型中，以便在视图中使用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Controller</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyController</span> &#123;<br>    <span class="hljs-meta">@ModelAttribute</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addAttributes</span><span class="hljs-params">(Model model)</span> &#123;<br>        model.addAttribute(<span class="hljs-string">&quot;msg&quot;</span>, <span class="hljs-string">&quot;Welcome to the site!&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@RequestMapping(&quot;/greeting&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">(<span class="hljs-meta">@ModelAttribute(&quot;user&quot;)</span> User user)</span> &#123;<br>        <span class="hljs-comment">// 处理逻辑</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;greeting&quot;</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>@ModelAttribute(&quot;user&quot;)</code> 将请求参数绑定到 <code>User</code> 对象，并将其添加到模型中，以便在视图中使用。</p>
+</li>
+<li><p><strong>在方法级别使用</strong>：预处理模型数据，在请求处理方法执行之前将数据添加到模型中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Controller</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyController</span> &#123;<br>    <span class="hljs-meta">@ModelAttribute(&quot;user&quot;)</span><br>    <span class="hljs-keyword">public</span> User <span class="hljs-title function_">getUser</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&quot;John&quot;</span>, <span class="hljs-string">&quot;Doe&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@RequestMapping(&quot;/profile&quot;)</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">profile</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 处理逻辑</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;profile&quot;</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>在这个例子中，<code>@ModelAttribute(&quot;user&quot;)</code> 方法将在每个请求处理方法执行之前被调用，并将返回的 <code>User</code> 对象添加到模型中。</p>
+</li>
+</ol>
+<hr>
+<h3 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h3><p>循环依赖（Circular Dependency）是指两个或多个模块、类、组件之间相互依赖，形成一个闭环。简而言之，模块A依赖于模块B，而模块B又依赖于模块A，这会导致依赖链的循环，无法确定加载或初始化的顺序。</p>
+<h4 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h4><p>Spring 通过三级缓存机制来解决循环依赖问题：</p>
+<ol>
+<li><strong>一级缓存</strong>：存储所有创建完毕的单例Bean（完整的Bean）。</li>
+<li><strong>二级缓存</strong>：存储所有仅完成实例化，但未进行属性注入和初始化的Bean。</li>
+<li><strong>三级缓存</strong>：存储能建立这个Bean的一个工厂，通过工厂能获取这个Bean，延迟化Bean的生成，工厂生成的Bean会塞入二级缓存。</li>
+</ol>
+<p>通过这种机制，Spring 可以在 Bean 初始化过程中提前暴露一个创建中的 Bean，从而解决循环依赖问题。</p>
+<p>在Spring中，只有同时满足以下两点才能解决循环依赖的问题：</p>
+<ol>
+<li>以来的Bean必须都是单例</li>
+<li>依赖注入的方式，必须<strong>不全是</strong>构造器注入，且<code>beanName</code>字母序在前的不能是构造器注入。</li>
+</ol>
+<blockquote>
+<p>Spring容器 根据<code>BeanName</code>字母序来创建Bean。</p>
+</blockquote>
+<h4 id="Spring解决循环依赖全流程："><a href="#Spring解决循环依赖全流程：" class="headerlink" title="Spring解决循环依赖全流程："></a>Spring解决循环依赖全流程：</h4><ol>
+<li>首先，获取Bean时会通过Bean Name先去一级缓存查找完整的Bean，如果找到直接返回，否则进行下一步；</li>
+<li>看对应的Bean是否在创建中，如果不在直接返回找不到（null），如果在，则会去二级缓存查找Bean，如果找到就返回，否则进行第三步；</li>
+<li>在三级缓存中根据Bean Name查找Bean对应的工厂，如果存在工厂则通过工厂创建Bean，并且放置到二级缓存中；</li>
+<li>如果三个缓存都没有找到，则返回null。</li>
+</ol>
+<p>举例，A依赖B，B依赖A，构成循环依赖。</p>
+<p>从上可知，如果查询发现Bean正在创建中，然后再调用<code>createBean</code>来创建Bean,而实际创建是调用方法<code>doCreateBean</code>。</p>
+<p><code>doCreateBean</code>这个方法会执行三个步骤：</p>
+<ol>
+<li>实例化</li>
+<li>属性注入</li>
+<li>初始化</li>
+</ol>
+<p>在实例化Bean后，会往三级缓存中塞入一个工厂，通过调用这个工厂的<code>getObject</code>方法就可以得到这个Bean。</p>
+<p>注意，Spring并不知道是否会有循环依赖发生，也不管，反正往三级缓存中塞入这个工厂。这就是提前暴露。</p>
+<p>然后开始执行属性注入，A发现需要注入B，所以去<code>getBean(B)</code>，此时又走一遍上面的逻辑，到了B的属性注入，此时B调用<code>getBean(A)</code>，这是一级缓存找不到，但是发现A正在创建，于是在二级缓存里找，没找到，再去三级缓存里找，找到了。</p>
+<p>通过再三级缓存里暴露的工厂得到A，然后将这个工厂从三级缓存里删除，并将A加入到二级缓存。</p>
+<p>B属性注入成功后，调用<code>initialzeBean</code>进行初始化，最后返回，将B加入到一级缓存。</p>
+<p>然后回到A的属性注入，从一级缓存里找到B注入，然后执行初始化，将A从二级缓存里删除，并加入到一级缓存里。</p>
+<blockquote>
+<p>重点：在对象实例化后，都会在三级缓存里加入一个工厂，提前暴露还未完整的Bean，破坏了循环依赖的条件。</p>
+<p>二级缓存虽然可以解决缓存依赖的问题，但在涉及到动态代理AOP时，直接使用二级缓存不做任何处理会导致我们拿到的Bean时未代理的原始对象。如果二级缓存内放的都是代理对象，则违反了Bean的生命周期。（正常代理的对象的生成是在被代理对象初始化后调用生成的）</p>
+</blockquote>
+<hr>
+<h3 id="Spring-MVC"><a href="#Spring-MVC" class="headerlink" title="Spring MVC"></a>Spring MVC</h3><p>Spring MVC 基于经典的MVC模式（Model-View-Controller），将Spring MVC将请求处理流程分为三层：模型层，视图层，控制层，它提供了一种松耦合的方式将用户请求，业务逻辑和视图渲染分离开。</p>
+<p>核心：<code>DispatcherServlet</code>，即前端控制器。通过注解，配置等方式，将HTTP请求映射到控制器方法，然后由控制器处理请求逻辑并将数据返回给视图层进行渲染。</p>
+<h4 id="工作流程："><a href="#工作流程：" class="headerlink" title="工作流程："></a>工作流程：</h4><ol>
+<li>客户端发起HTTP请求</li>
+<li>请求被发送到<code>DispatcherServlet</code>（前端控制器）</li>
+<li><code>DispatcherServlet</code>根据<code>HandleMapping</code>（处理映射器）将 <code>url</code>请求映射到对应的<code>Controller</code>上</li>
+<li>控制器接受请求并执行相应的业务逻辑，通过<code>@RequestMapping</code>和<code>@Controller</code>注解定义映射的请求方法</li>
+<li>控制器将返回的数据封装到模型对象中去，然后返回对应的视图</li>
+<li><code>DispatcherServlet</code>会调用视图解析器，来解析返回的视图信息</li>
+<li>根据解析好的视图信息，将数据模型渲染到浏览器，并返回客户端</li>
+</ol>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/25/SpringBoot/" title="SpringBoot">
+                        <span class="hidden-mobile">SpringBoot</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
